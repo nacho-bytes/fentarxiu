@@ -17,7 +17,7 @@ CATALOGUE_TABLE: dict[tuple[int, str], str] = {
     (0, "00"): "Guió",
     (1, "00"): "Flauta",
     (1, "01"): "Flautí",
-    (1, "02"): "Oboe",
+    (1, "02"): "Oboè",
     (1, "03"): "CornAnglès",
     (1, "04"): "Fagot",
     (1, "05"): "Requint",

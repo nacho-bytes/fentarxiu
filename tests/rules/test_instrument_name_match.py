@@ -27,6 +27,40 @@ class TestInstrumentNameMatchRuleMatch:
         rule = InstrumentNameMatchRule(catalogue=InstrumentCatalogue.default())
         assert rule.check("1000+2020_Flauta+Trompeta.pdf") == []
 
+    def test_name_with_optional_voice_suffix_1(self) -> None:
+        # (1, "06") -> "Clarinet"; _1 is optional voice suffix
+        rule = InstrumentNameMatchRule(catalogue=InstrumentCatalogue.default())
+        assert rule.check("1061_Clarinet_1.pdf") == []
+
+    def test_name_with_optional_voice_suffix_2(self) -> None:
+        rule = InstrumentNameMatchRule(catalogue=InstrumentCatalogue.default())
+        assert rule.check("1062_Clarinet_2.pdf") == []
+
+    def test_name_with_optional_voice_suffix_3(self) -> None:
+        rule = InstrumentNameMatchRule(catalogue=InstrumentCatalogue.default())
+        assert rule.check("1063_Clarinet_3.pdf") == []
+
+    def test_name_with_optional_voice_suffix_10(self) -> None:
+        # (1, "06") -> "Clarinet"; _10 is optional voice suffix
+        rule = InstrumentNameMatchRule(catalogue=InstrumentCatalogue.default())
+        assert rule.check("1060_Clarinet_10.pdf") == []
+
+    def test_name_with_voice_suffix_trompeta_and_trombo(self) -> None:
+        # (2, "02") -> "Trompeta", (2, "05") -> "Trombó"
+        rule = InstrumentNameMatchRule(catalogue=InstrumentCatalogue.default())
+        assert rule.check("2021+2050_Trompeta_2+Trombó_1.pdf") == []
+
+    def test_name_with_optional_voice_suffix_principal(self) -> None:
+        # (1, "06") -> "Clarinet"; _Principal is special word, same as voice suffix
+        rule = InstrumentNameMatchRule(catalogue=InstrumentCatalogue.default())
+        assert rule.check("1060_Clarinet_Principal.pdf") == []
+
+    def test_name_principal_and_voice_number_combined(self) -> None:
+        # 1060+1061 -> Clarinet for both; Clarinet_Principal and Clarinet_1
+        # both normalize to Clarinet
+        rule = InstrumentNameMatchRule(catalogue=InstrumentCatalogue.default())
+        assert rule.check("1060+1061_Clarinet_Principal+Clarinet_1.pdf") == []
+
 
 class TestInstrumentNameMatchRuleMismatch:
     """Name does not match catalogue -> InstrumentNameMismatchFailure."""
@@ -49,6 +83,15 @@ class TestInstrumentNameMatchRuleMismatch:
         assert len(result) == 1
         assert result[0].received_name == "WrongName"
         assert result[0].expected_name == "Trompeta"
+
+    def test_voice_suffix_but_base_name_mismatch(self) -> None:
+        # (1, "00") -> "Flauta"; "Clarinet_1" normalizes to "Clarinet" != "Flauta"
+        rule = InstrumentNameMatchRule(catalogue=InstrumentCatalogue.default())
+        result = rule.check("1000_Clarinet_1.pdf")
+        assert len(result) == 1
+        assert isinstance(result[0], InstrumentNameMismatchFailure)
+        assert result[0].received_name == "Clarinet_1"
+        assert result[0].expected_name == "Flauta"
 
 
 class TestInstrumentNameMatchRuleNotInCatalogue:

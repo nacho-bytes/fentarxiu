@@ -1,5 +1,7 @@
 """Instrument name must match the code in the prefix."""
 
+import re
+
 import attrs
 
 from string_checker.data import InstrumentCatalogue, parse_filename
@@ -8,6 +10,11 @@ from string_checker.rules import RuleChecker
 from string_checker.rules.instrument_name_match.failures import (
     InstrumentNameMismatchFailure,
 )
+
+
+def _normalize_name_for_match(name: str) -> str:
+    """Strip optional voice suffix _X (X = 1, 2, 3, ...) or _Principal."""
+    return re.sub(r"_(?:[1-9]\d*|Principal)$", "", name)
 
 
 @attrs.define
@@ -32,7 +39,8 @@ class InstrumentNameMatchRule(RuleChecker):
             expected = self.catalogue.get_name(instrument_range, code)
             if expected is None:
                 continue
-            if name != expected:
+            normalized = _normalize_name_for_match(name)
+            if normalized != expected:
                 failures.append(
                     InstrumentNameMismatchFailure(
                         instrument_range=instrument_range,
