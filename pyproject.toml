@@ -1,11 +1,26 @@
+[build-system]
+requires = ["setuptools>=61", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[tool.setuptools.packages.find]
+where = ["src"]
+
 [project]
 name = "fentarxiu"
 version = "0.1.0"
 requires-python = "==3.14.2"
 dependencies = [
     "attrs==25.4.0",
+    "google-api-python-client==2.189.0",
+    "google-auth-httplib2==0.3.0",
+    "google-auth-oauthlib==1.2.4",
+    "python-dotenv==1.2.1",
     "returns==0.26.0",
+    "typer==0.21.1",
 ]
+
+[project.scripts]
+fentarxiu = "cli.main:app"
 
 [dependency-groups]
 dev = [
@@ -25,6 +40,8 @@ fixable = ["ALL"]
 
 [tool.ruff.lint.per-file-ignores]
 "tests/**/*.py" = ["S101", "D102", "D104", "PLR2004"]
+"src/drive_connection/drive.py" = ["S105"]
+"src/cli/main.py" = ["FBT001", "FBT003"]
 
 [tool.ruff.format]
 

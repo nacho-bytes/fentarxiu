@@ -150,6 +150,10 @@ activemq-data/
 # Environments
 .env
 .envrc
+
+# Google Drive (do not commit secrets)
+credentials.json
+token.json
 .venv
 env/
 venv/

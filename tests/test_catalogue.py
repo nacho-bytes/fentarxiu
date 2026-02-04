@@ -13,7 +13,7 @@ class TestInstrumentCatalogueDefault:
     def test_default_has_expected_entries(self) -> None:
         cat = InstrumentCatalogue.default()
         assert cat.has(0, "00") is True
-        assert cat.get_name(0, "00") == "Guia"
+        assert cat.get_name(0, "00") == "Guió"
         assert cat.has(1, "00") is True
         assert cat.get_name(1, "00") == "Flauta"
         assert cat.has(1, "01") is True

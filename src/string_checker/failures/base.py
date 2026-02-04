@@ -20,6 +20,7 @@ class FailureKind(Enum):
     PREFIX = "prefix"
     INSTRUMENT_NAME_MISMATCH = "instrument_name_mismatch"
     VOICE_INVALID = "voice_invalid"
+    NOT_PDF = "not_pdf"
 
 
 class ValidationFailure(ABC):

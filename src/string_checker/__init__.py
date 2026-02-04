@@ -23,6 +23,7 @@ from string_checker.rules.instrument_name_match import (
     InstrumentNameMatchRule,
     InstrumentNameMismatchFailure,
 )
+from string_checker.rules.pdf_extension import NotPdfFailure, PdfExtensionRule
 from string_checker.rules.prefix import InvalidPrefixFailure, PrefixRule
 from string_checker.rules.valid_chars import InvalidCharacterFailure, ValidCharsRule
 from string_checker.rules.voice import InvalidVoiceFailure, VoiceRule
@@ -36,6 +37,8 @@ __all__ = [
     "InvalidCharacterFailure",
     "InvalidPrefixFailure",
     "InvalidVoiceFailure",
+    "NotPdfFailure",
+    "PdfExtensionRule",
     "PrefixRule",
     "ValidCharsRule",
     "ValidationFailure",

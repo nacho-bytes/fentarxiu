@@ -15,6 +15,7 @@ from string_checker import (
 )
 from string_checker.failures.base import ValidationFailure
 from string_checker.rules import RuleChecker
+from string_checker.rules.pdf_extension import NotPdfFailure, PdfExtensionRule
 
 
 def _fake_rule(failures: list[ValidationFailure]) -> RuleChecker:
@@ -99,7 +100,7 @@ class TestCheckerUnitMultipleRules:
 
 
 class TestCheckerIntegration:
-    """Full Checker with all four rules."""
+    """Full Checker with all five rules (including PdfExtensionRule)."""
 
     def _full_checker(self) -> Checker:
         catalogue = InstrumentCatalogue.default()
@@ -109,6 +110,7 @@ class TestCheckerIntegration:
                 PrefixRule(catalogue),
                 InstrumentNameMatchRule(catalogue),
                 VoiceRule(),
+                PdfExtensionRule(),
             ]
         )
 
@@ -147,3 +149,17 @@ class TestCheckerIntegration:
         assert isinstance(result, Failure)
         failures = result.failure()
         assert len(failures) >= 2
+
+    def test_filename_without_pdf_returns_not_pdf_failure(self) -> None:
+        checker = self._full_checker()
+        result = checker.check("1010_Flautí")
+        assert isinstance(result, Failure)
+        failures = result.failure()
+        assert any(isinstance(f, NotPdfFailure) for f in failures)
+
+    def test_filename_with_wrong_extension_returns_not_pdf_failure(self) -> None:
+        checker = self._full_checker()
+        result = checker.check("1010_Flautí.docx")
+        assert isinstance(result, Failure)
+        failures = result.failure()
+        assert any(isinstance(f, NotPdfFailure) for f in failures)

@@ -14,7 +14,7 @@ Table: Range, Code, Instrument, Normalized instrument name.
 # Rang 6: Cor
 
 CATALOGUE_TABLE: dict[tuple[int, str], str] = {
-    (0, "00"): "Guia",
+    (0, "00"): "Guió",
     (1, "00"): "Flauta",
     (1, "01"): "Flautí",
     (1, "02"): "Oboe",

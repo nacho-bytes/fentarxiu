@@ -6,6 +6,7 @@ from string_checker import (
     InvalidCharacterFailure,
     InvalidPrefixFailure,
     InvalidVoiceFailure,
+    NotPdfFailure,
     ValidationFailure,
 )
 
@@ -24,6 +25,9 @@ class TestFailureKind:
 
     def test_voice_invalid_exists(self) -> None:
         assert FailureKind.VOICE_INVALID.value == "voice_invalid"
+
+    def test_not_pdf_exists(self) -> None:
+        assert FailureKind.NOT_PDF.value == "not_pdf"
 
 
 class TestConcreteFailuresCodeAndInstance:
@@ -69,3 +73,9 @@ class TestConcreteFailuresCodeAndInstance:
         assert f.prefix_code == "01"
         assert f.received_name == "Flauta"
         assert f.expected_name == "Flautí"
+
+    def test_not_pdf_failure(self) -> None:
+        f = NotPdfFailure(message="Filename must end with .pdf.")
+        assert isinstance(f, ValidationFailure)
+        assert f.code == FailureKind.NOT_PDF
+        assert f.message == "Filename must end with .pdf."

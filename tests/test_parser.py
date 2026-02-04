@@ -53,10 +53,10 @@ class TestParseFilenameReturnsParsedFilename:
         assert result.names == ["Flautí"]
 
     def test_multiple_blocks(self) -> None:
-        result = parse_filename("1000+2010_Guia+Trompeta.pdf")
+        result = parse_filename("1000+2010_Guió+Trompeta.pdf")
         assert result is not None
         assert result.blocks == [(1, "00", 0), (2, "01", 0)]
-        assert result.names == ["Guia", "Trompeta"]
+        assert result.names == ["Guió", "Trompeta"]
 
     def test_blocks_range_code_voice_parsed_correctly(self) -> None:
         # instrument_range=2, code="02", voice=3

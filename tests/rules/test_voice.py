@@ -30,4 +30,4 @@ class TestVoiceRuleValidBlocks:
 
     def test_multiple_blocks_valid_voices(self) -> None:
         rule = VoiceRule()
-        assert rule.check("1000+2002+3099_Guia+Trompeta+Altres.pdf") == []
+        assert rule.check("1000+2002+3099_Guió+Trompeta+Altres.pdf") == []
