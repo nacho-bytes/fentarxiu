@@ -17,8 +17,18 @@ Example:
 """
 
 from string_checker.checker import Checker
-from string_checker.data import InstrumentCatalogue, parse_filename
+from string_checker.data import (
+    InstrumentCatalogue,
+    ParsedFolderName,
+    parse_filename,
+    parse_folder_name,
+)
 from string_checker.failures import FailureKind, ValidationFailure
+from string_checker.rules.folder_name import FolderNameRule, InvalidFolderNameFailure
+from string_checker.rules.folder_valid_chars import (
+    FolderValidCharsRule,
+    InvalidFolderCharacterFailure,
+)
 from string_checker.rules.instrument_name_match import (
     InstrumentNameMatchRule,
     InstrumentNameMismatchFailure,
@@ -31,17 +41,23 @@ from string_checker.rules.voice import InvalidVoiceFailure, VoiceRule
 __all__ = [
     "Checker",
     "FailureKind",
+    "FolderNameRule",
+    "FolderValidCharsRule",
     "InstrumentCatalogue",
     "InstrumentNameMatchRule",
     "InstrumentNameMismatchFailure",
     "InvalidCharacterFailure",
+    "InvalidFolderCharacterFailure",
+    "InvalidFolderNameFailure",
     "InvalidPrefixFailure",
     "InvalidVoiceFailure",
     "NotPdfFailure",
+    "ParsedFolderName",
     "PdfExtensionRule",
     "PrefixRule",
     "ValidCharsRule",
     "ValidationFailure",
     "VoiceRule",
     "parse_filename",
+    "parse_folder_name",
 ]

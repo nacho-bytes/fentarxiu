@@ -4,6 +4,8 @@ from string_checker import (
     FailureKind,
     InstrumentNameMismatchFailure,
     InvalidCharacterFailure,
+    InvalidFolderCharacterFailure,
+    InvalidFolderNameFailure,
     InvalidPrefixFailure,
     InvalidVoiceFailure,
     NotPdfFailure,
@@ -28,6 +30,12 @@ class TestFailureKind:
 
     def test_not_pdf_exists(self) -> None:
         assert FailureKind.NOT_PDF.value == "not_pdf"
+
+    def test_folder_name_exists(self) -> None:
+        assert FailureKind.FOLDER_NAME.value == "folder_name"
+
+    def test_folder_valid_chars_exists(self) -> None:
+        assert FailureKind.FOLDER_VALID_CHARS.value == "folder_valid_chars"
 
 
 class TestConcreteFailuresCodeAndInstance:
@@ -79,3 +87,16 @@ class TestConcreteFailuresCodeAndInstance:
         assert isinstance(f, ValidationFailure)
         assert f.code == FailureKind.NOT_PDF
         assert f.message == "Filename must end with .pdf."
+
+    def test_invalid_folder_name_failure(self) -> None:
+        f = InvalidFolderNameFailure(message="Expected format: Work_Author.")
+        assert isinstance(f, ValidationFailure)
+        assert f.code == FailureKind.FOLDER_NAME
+        assert f.message == "Expected format: Work_Author."
+
+    def test_invalid_folder_character_failure(self) -> None:
+        f = InvalidFolderCharacterFailure(index=0, char="@")
+        assert isinstance(f, ValidationFailure)
+        assert f.code == FailureKind.FOLDER_VALID_CHARS
+        assert f.index == 0
+        assert f.char == "@"

@@ -20,7 +20,8 @@ dependencies = [
 ]
 
 [project.scripts]
-fentarxiu = "cli.main:app"
+sheet_parser = "cli.sheet_parser:app"
+work_parser = "cli.work_parser:app"
 
 [dependency-groups]
 dev = [
@@ -41,7 +42,8 @@ fixable = ["ALL"]
 [tool.ruff.lint.per-file-ignores]
 "tests/**/*.py" = ["S101", "D102", "D104", "PLR2004"]
 "src/drive_connection/drive.py" = ["S105"]
-"src/cli/main.py" = ["FBT001", "FBT003"]
+"src/cli/sheet_parser.py" = ["FBT001", "FBT003"]
+"src/cli/work_parser.py" = ["FBT001", "FBT003"]
 
 [tool.ruff.format]
 

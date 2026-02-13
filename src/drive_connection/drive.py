@@ -138,6 +138,50 @@ def list_file_names(
     )
 
 
+def list_subfolder_names(
+    service: object,
+    folder_id: str,
+) -> Iterator[tuple[str, str]]:
+    """Yield (folder_name, display_path) for each direct child folder.
+
+    Only direct children are listed; no recursion. display_path is the
+    folder name (no path prefix).
+
+    Args:
+        service: The Drive v3 service from load_credentials_and_build_service.
+        folder_id: The Drive folder ID to list.
+
+    Yields:
+        (folder_name, display_path) for each direct subfolder.
+
+    """
+    page_token: str | None = None
+    while True:
+        try:
+            response = (
+                service.files()
+                .list(
+                    q=f"'{folder_id}' in parents and mimeType = '{FOLDER_MIMETYPE}'",
+                    pageSize=100,
+                    fields="nextPageToken, files(name)",
+                    pageToken=page_token or "",
+                    supportsAllDrives=True,
+                )
+                .execute()
+            )
+        except HttpError as e:
+            msg = f"Drive API error: {e}"
+            raise DriveConnectionError(msg) from e
+
+        for item in response.get("files", []):
+            name = item.get("name", "")
+            yield (name, name)
+
+        page_token = response.get("nextPageToken")
+        if not page_token:
+            break
+
+
 def _list_file_names_impl(
     service: object,
     folder_id: str,

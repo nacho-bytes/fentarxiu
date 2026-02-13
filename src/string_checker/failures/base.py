@@ -21,6 +21,8 @@ class FailureKind(Enum):
     INSTRUMENT_NAME_MISMATCH = "instrument_name_mismatch"
     VOICE_INVALID = "voice_invalid"
     NOT_PDF = "not_pdf"
+    FOLDER_NAME = "folder_name"
+    FOLDER_VALID_CHARS = "folder_valid_chars"
 
 
 class ValidationFailure(ABC):

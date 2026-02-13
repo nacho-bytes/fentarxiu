@@ -4,10 +4,14 @@ from returns.result import Failure, Success
 
 from string_checker import (
     Checker,
+    FolderNameRule,
+    FolderValidCharsRule,
     InstrumentCatalogue,
     InstrumentNameMatchRule,
     InstrumentNameMismatchFailure,
     InvalidCharacterFailure,
+    InvalidFolderCharacterFailure,
+    InvalidFolderNameFailure,
     InvalidPrefixFailure,
     PrefixRule,
     ValidCharsRule,
@@ -163,3 +167,36 @@ class TestCheckerIntegration:
         assert isinstance(result, Failure)
         failures = result.failure()
         assert any(isinstance(f, NotPdfFailure) for f in failures)
+
+
+class TestCheckerIntegrationFolder:
+    """Checker with FolderValidCharsRule and FolderNameRule for folder names."""
+
+    def _folder_checker(self) -> Checker:
+        return Checker(
+            rules=[
+                FolderValidCharsRule(),
+                FolderNameRule(),
+            ]
+        )
+
+    def test_valid_folder_name_returns_success(self) -> None:
+        checker = self._folder_checker()
+        result = checker.check("Obra_Author")
+        assert isinstance(result, Success)
+        result = checker.check("Obra_Author_Arranger")
+        assert isinstance(result, Success)
+
+    def test_invalid_folder_format_returns_folder_name_failure(self) -> None:
+        checker = self._folder_checker()
+        result = checker.check("OnlyWorkNoUnderscore")
+        assert isinstance(result, Failure)
+        failures = result.failure()
+        assert any(isinstance(f, InvalidFolderNameFailure) for f in failures)
+
+    def test_invalid_character_in_folder_returns_folder_char_failure(self) -> None:
+        checker = self._folder_checker()
+        result = checker.check("Obra_Author#_Arr")
+        assert isinstance(result, Failure)
+        failures = result.failure()
+        assert any(isinstance(f, InvalidFolderCharacterFailure) for f in failures)
