@@ -1,4 +1,4 @@
-"""Google Drive API: credential loading and recursive file listing.
+"""Google Drive API: credential loading, file listing, folder and shortcut creation.
 
 Uses OAuth 2.0 Desktop app flow. Credential and token paths are read from
 environment variables (e.g. after loading .env with python-dotenv).
@@ -14,15 +14,19 @@ from google_auth_oauthlib.flow import InstalledAppFlow
 from googleapiclient.discovery import build
 from googleapiclient.errors import HttpError
 
-# Scope for listing file metadata (names, ids, mime types).
-SCOPES = ["https://www.googleapis.com/auth/drive.metadata.readonly"]
+# Scopes: metadata read for listing; full drive for creating folders and shortcuts.
+SCOPES = [
+    "https://www.googleapis.com/auth/drive.metadata.readonly",
+    "https://www.googleapis.com/auth/drive",
+]
 
 # Default paths relative to current working directory.
 DEFAULT_CREDENTIALS_PATH = "credentials.json"
 DEFAULT_TOKEN_PATH = "token.json"
 
-# Mime type for Drive folders.
+# Mime types for Drive resources.
 FOLDER_MIMETYPE = "application/vnd.google-apps.folder"
+SHORTCUT_MIMETYPE = "application/vnd.google-apps.shortcut"
 
 
 class DriveConnectionError(Exception):
@@ -180,6 +184,93 @@ def list_subfolder_names(
         page_token = response.get("nextPageToken")
         if not page_token:
             break
+
+
+def create_folder(
+    service: object,
+    name: str,
+    parent_id: str | None = None,
+) -> dict:
+    """Create a Drive folder and return the created file resource.
+
+    Args:
+        service: The Drive v3 service from load_credentials_and_build_service.
+        name: Name of the folder.
+        parent_id: Drive folder ID for the parent; if None, folder is created
+            in the user's Drive root.
+
+    Returns:
+        The file resource dict returned by the API (includes id, name, etc.).
+
+    Raises:
+        DriveConnectionError: If the API call fails.
+
+    """
+    body: dict = {
+        "name": name,
+        "mimeType": FOLDER_MIMETYPE,
+    }
+    if parent_id is not None:
+        body["parents"] = [parent_id]
+    else:
+        body["parents"] = ["root"]
+    try:
+        result = (
+            service.files()
+            .create(body=body, fields="id, name, mimeType", supportsAllDrives=True)
+            .execute()
+        )
+    except HttpError as e:
+        msg = f"Drive API error: {e}"
+        raise DriveConnectionError(msg) from e
+    return result
+
+
+def create_shortcut(
+    service: object,
+    target_id: str,
+    *,
+    name: str | None = None,
+    parent_id: str | None = None,
+    target_mime_type: str | None = None,
+) -> dict:
+    """Create a Drive shortcut pointing to a file and return the created resource.
+
+    Args:
+        service: The Drive v3 service from load_credentials_and_build_service.
+        target_id: Drive file ID the shortcut points to.
+        name: Optional display name for the shortcut; if None, Drive may assign one.
+        parent_id: Drive folder ID where to create the shortcut; if None, created
+            in the user's Drive root.
+        target_mime_type: Optional MIME type of the target (e.g. for Docs/Sheets).
+
+    Returns:
+        The file resource dict returned by the API (includes id, name, etc.).
+
+    Raises:
+        DriveConnectionError: If the API call fails.
+
+    """
+    shortcut_details: dict = {"targetId": target_id}
+    if target_mime_type is not None:
+        shortcut_details["targetMimeType"] = target_mime_type
+    body: dict = {
+        "mimeType": SHORTCUT_MIMETYPE,
+        "shortcutDetails": shortcut_details,
+        "parents": [parent_id] if parent_id is not None else ["root"],
+    }
+    if name is not None:
+        body["name"] = name
+    try:
+        result = (
+            service.files()
+            .create(body=body, fields="id, name, mimeType", supportsAllDrives=True)
+            .execute()
+        )
+    except HttpError as e:
+        msg = f"Drive API error: {e}"
+        raise DriveConnectionError(msg) from e
+    return result
 
 
 def _list_file_names_impl(
